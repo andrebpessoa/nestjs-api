@@ -19,7 +19,7 @@ export class NewsService {
 		return this.prisma.news.create({
 			data: {
 				title: dto.title,
-				content: dto.content as Prisma.InputJsonValue,
+				content: dto.content,
 				published: dto.published ?? false,
 				authorId,
 			},
@@ -112,7 +112,7 @@ export class NewsService {
 			where: { id },
 			data: {
 				title: dto.title,
-				content: dto.content as Prisma.InputJsonValue | undefined,
+				content: dto.content,
 				published: dto.published,
 			},
 		});
