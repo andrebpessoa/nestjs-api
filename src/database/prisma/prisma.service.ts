@@ -1,7 +1,7 @@
 import { Injectable, OnModuleDestroy } from "@nestjs/common";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { env } from "@/config/env";
-import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaClient } from "./generated/prisma/client";
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleDestroy {
@@ -14,5 +14,4 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy {
 	}
 }
 
-// Shared singleton for consumers that live outside NestJS DI (e.g. better-auth).
 export const prisma = new PrismaService();
