@@ -2,6 +2,10 @@ import { UnauthorizedException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserSession } from "@thallesp/nestjs-better-auth";
 import { auth } from "@/lib/auth";
+import { FeedQueryDto } from "./dto/feed-query.dto";
+import { feedQuerySchema } from "./dto/feed-query.dto";
+import { NewsQueryDto } from "./dto/news-query.dto";
+import { newsQuerySchema } from "./dto/news-query.dto";
 import { CreateNewsDto } from "./dto/create-news.dto";
 import { UpdateNewsDto } from "./dto/update-news.dto";
 import { NewsController } from "./news.controller";
@@ -35,9 +39,16 @@ describe("NewsController", () => {
 		controller = module.get<NewsController>(NewsController);
 	});
 
-	it("feed should delegate to findPublicFeed", () => {
-		controller.feed();
-		expect(newsServiceMock.findPublicFeed).toHaveBeenCalledTimes(1);
+	it("feed delegates query to findPublicFeed", () => {
+		const query = feedQuerySchema.parse({}) as unknown as FeedQueryDto;
+		controller.feed(query);
+		expect(newsServiceMock.findPublicFeed).toHaveBeenCalledWith(query);
+	});
+
+	it("findAll delegates query to newsService.findAll", () => {
+		const query = newsQuerySchema.parse({}) as unknown as NewsQueryDto;
+		controller.findAll(query);
+		expect(newsServiceMock.findAll).toHaveBeenCalledWith(query);
 	});
 
 	it("create should pass authenticated user id to service", () => {

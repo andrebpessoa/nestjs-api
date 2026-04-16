@@ -6,6 +6,7 @@ import {
 	Param,
 	Patch,
 	Post,
+	Query,
 	UnauthorizedException,
 } from "@nestjs/common";
 import {
@@ -15,6 +16,8 @@ import {
 } from "@thallesp/nestjs-better-auth";
 import { auth } from "@/lib/auth";
 import { CreateNewsDto } from "./dto/create-news.dto";
+import { FeedQueryDto } from "./dto/feed-query.dto";
+import { NewsQueryDto } from "./dto/news-query.dto";
 import { UpdateNewsDto } from "./dto/update-news.dto";
 import { NewsService } from "./news.service";
 
@@ -24,8 +27,8 @@ export class NewsController {
 
 	@AllowAnonymous()
 	@Get("feed")
-	feed() {
-		return this.newsService.findPublicFeed();
+	feed(@Query() query: FeedQueryDto) {
+		return this.newsService.findPublicFeed(query);
 	}
 
 	@AllowAnonymous()
@@ -51,8 +54,8 @@ export class NewsController {
 	}
 
 	@Get()
-	findAll() {
-		return this.newsService.findAll();
+	findAll(@Query() query: NewsQueryDto) {
+		return this.newsService.findAll(query);
 	}
 
 	@Get(":id")
