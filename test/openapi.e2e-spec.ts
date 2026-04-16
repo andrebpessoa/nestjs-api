@@ -48,4 +48,30 @@ describe("OpenAPI docs (e2e)", () => {
 			await app.close();
 		}
 	});
+
+	it("documents news routes with tags, summaries and cookie auth", async () => {
+		const app = await createAppForEnv("development");
+
+		try {
+			const response = await request(app.getHttpServer())
+				.get("/openapi.json")
+				.expect(200);
+
+			const doc = response.body as Record<string, any>;
+			const feedOperation = doc.paths?.["/news/feed"]?.get;
+			const adminListOperation = doc.paths?.["/news"]?.get;
+			const postOperation = doc.paths?.["/news"]?.post;
+			const securitySchemes = doc.components?.securitySchemes ?? {};
+
+			expect(feedOperation?.tags).toContain("news");
+			expect(feedOperation?.summary).toBe("List published news");
+			expect(postOperation?.summary).toBe("Create a news item");
+
+			expect(Array.isArray(adminListOperation?.security)).toBe(true);
+			expect(adminListOperation.security.length).toBeGreaterThan(0);
+			expect(Object.keys(securitySchemes).length).toBeGreaterThan(0);
+		} finally {
+			await app.close();
+		}
+	});
 });
