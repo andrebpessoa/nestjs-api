@@ -1,42 +1,23 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { createZodDto } from "nestjs-zod";
+import * as z from "zod";
 
-export class NewsResponseDto {
-	@ApiProperty({ example: "cm9zhf3lg00008v3f07aq8bxz" })
-	id!: string;
+export const newsResponseSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	content: z.record(z.string(), z.unknown()),
+	published: z.boolean(),
+	authorId: z.string(),
+	createdAt: z.iso.datetime(),
+	updatedAt: z.iso.datetime(),
+});
 
-	@ApiProperty({ example: "Breaking news" })
-	title!: string;
+export class NewsResponseDto extends createZodDto(newsResponseSchema) {}
 
-	@ApiProperty({
-		type: "object",
-		additionalProperties: true,
-		example: {
-			blocks: [{ type: "paragraph", text: "Lorem ipsum" }],
-		},
-	})
-	content!: Record<string, unknown>;
+export const paginatedNewsResponseSchema = z.object({
+	data: z.array(newsResponseSchema),
+	nextCursor: z.string().nullable(),
+});
 
-	@ApiProperty({ example: false })
-	published!: boolean;
-
-	@ApiProperty({ example: "cm9zhf3lg00018v3f2n2h4k0n" })
-	authorId!: string;
-
-	@ApiProperty({ type: String, format: "date-time" })
-	createdAt!: string;
-
-	@ApiProperty({ type: String, format: "date-time" })
-	updatedAt!: string;
-}
-
-export class PaginatedNewsResponseDto {
-	@ApiProperty({ type: [NewsResponseDto] })
-	data!: NewsResponseDto[];
-
-	@ApiProperty({
-		type: String,
-		nullable: true,
-		example: "cm9zhf3lg00048v3fngmc4o9f",
-	})
-	nextCursor!: string | null;
-}
+export class PaginatedNewsResponseDto extends createZodDto(
+	paginatedNewsResponseSchema,
+) {}
