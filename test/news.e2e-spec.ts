@@ -50,10 +50,6 @@ describe("News API (e2e)", () => {
 		const setCookie = response.headers["set-cookie"];
 		expect(setCookie).toBeDefined();
 
-		if (!setCookie) {
-			throw new Error("No auth cookie returned by sign-up endpoint");
-		}
-
 		return Array.isArray(setCookie)
 			? setCookie.map((cookie: string) => cookie.split(";")[0]).join("; ")
 			: setCookie.split(";")[0];
