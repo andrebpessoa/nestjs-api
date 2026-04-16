@@ -63,7 +63,9 @@ describe("NewsController", () => {
 		};
 		const session = { user: {} } as UserSession<typeof auth>;
 
-		expect(() => controller.create(session, dto)).toThrow(UnauthorizedException);
+		expect(() => controller.create(session, dto)).toThrow(
+			UnauthorizedException,
+		);
 	});
 
 	it("update should delegate id and dto as string + payload", () => {

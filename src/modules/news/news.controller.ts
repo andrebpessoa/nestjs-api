@@ -42,7 +42,9 @@ export class NewsController {
 		const authorId = session?.user?.id;
 
 		if (!authorId) {
-			throw new UnauthorizedException("Authenticated user not found in session");
+			throw new UnauthorizedException(
+				"Authenticated user not found in session",
+			);
 		}
 
 		return this.newsService.create(authorId, createNewsDto);

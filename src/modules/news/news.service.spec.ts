@@ -1,6 +1,6 @@
+import { PrismaService } from "@db/prisma/prisma.service";
 import { NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
-import { PrismaService } from "@db/prisma/prisma.service";
 import { CreateNewsDto } from "./dto/create-news.dto";
 import { NewsService } from "./news.service";
 

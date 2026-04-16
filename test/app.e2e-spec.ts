@@ -1,10 +1,10 @@
+import { PrismaService } from "@db/prisma/prisma.service";
 import { INestApplication } from "@nestjs/common";
 import {
 	FastifyAdapter,
 	NestFastifyApplication,
 } from "@nestjs/platform-fastify";
 import { Test, TestingModule } from "@nestjs/testing";
-import { PrismaService } from "@db/prisma/prisma.service";
 import request from "supertest";
 import { App } from "supertest/types";
 import { AppModule } from "./../src/app.module";
@@ -89,10 +89,18 @@ describe("News API (e2e)", () => {
 
 	it("GET /news/feed is public and returns only published items", async () => {
 		const cookie = await signUpAndGetCookie();
-		const draft = await createNews(cookie, { title: "Draft", published: false });
-		const published = await createNews(cookie, { title: "Public", published: true });
+		const draft = await createNews(cookie, {
+			title: "Draft",
+			published: false,
+		});
+		const published = await createNews(cookie, {
+			title: "Public",
+			published: true,
+		});
 
-		const response = await request(app.getHttpServer()).get("/news/feed").expect(200);
+		const response = await request(app.getHttpServer())
+			.get("/news/feed")
+			.expect(200);
 
 		expect(response.body).toEqual(
 			expect.arrayContaining([
@@ -108,7 +116,9 @@ describe("News API (e2e)", () => {
 		const cookie = await signUpAndGetCookie();
 		const draft = await createNews(cookie, { published: false });
 
-		await request(app.getHttpServer()).get(`/news/feed/${draft.id}`).expect(404);
+		await request(app.getHttpServer())
+			.get(`/news/feed/${draft.id}`)
+			.expect(404);
 	});
 
 	it("GET /news requires authentication", () => {

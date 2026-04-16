@@ -1,6 +1,6 @@
+import { PrismaService } from "@db/prisma/prisma.service";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { News, Prisma } from "@/generated/prisma/client";
-import { PrismaService } from "@db/prisma/prisma.service";
 import { CreateNewsDto } from "./dto/create-news.dto";
 import { UpdateNewsDto } from "./dto/update-news.dto";
 
