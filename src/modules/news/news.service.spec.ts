@@ -44,7 +44,7 @@ describe("NewsService", () => {
 		const result = await service.findPublicFeed(query);
 
 		expect(prismaMock.news.findMany).toHaveBeenCalledWith({
-			where: { published: true },
+			where: { published: true, deletedAt: null },
 			orderBy: [{ createdAt: "desc" }, { id: "desc" }],
 			take: 21,
 		});
@@ -59,7 +59,7 @@ describe("NewsService", () => {
 
 		expect(prismaMock.news.findMany).toHaveBeenCalledWith(
 			expect.objectContaining({
-				where: { published: true, title: { contains: "nestjs" } },
+				where: { published: true, title: { contains: "nestjs" }, deletedAt: null },
 			}),
 		);
 	});
@@ -121,6 +121,17 @@ describe("NewsService", () => {
 		expect(callArgs?.where.createdAt).toBeDefined();
 		expect(callArgs?.where.createdAt?.gte).toBeInstanceOf(Date);
 		expect(callArgs?.where.createdAt?.lte).toBeInstanceOf(Date);
+		expect(callArgs?.where.deletedAt).toBeNull();
+	});
+
+	it("findPublicById filters out deleted news", async () => {
+		prismaMock.news.findFirst.mockResolvedValue(null);
+
+		await service.findPublicById("news_deleted").catch(() => {});
+
+		expect(prismaMock.news.findFirst).toHaveBeenCalledWith({
+			where: { id: "news_deleted", published: true, deletedAt: null },
+		});
 	});
 
 	// --- findPublicById ---

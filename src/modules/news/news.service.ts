@@ -33,6 +33,7 @@ export class NewsService {
 
 		const where: Prisma.NewsWhereInput = {
 			published: true,
+			deletedAt: null,
 			...(q && { title: { contains: q } }),
 			...((parsedDateFrom || parsedDateTo) && {
 				createdAt: { gte: parsedDateFrom, lte: parsedDateTo },
@@ -51,7 +52,7 @@ export class NewsService {
 
 	async findPublicById(id: string): Promise<News> {
 		const news = await this.prisma.news.findFirst({
-			where: { id, published: true },
+			where: { id, published: true, deletedAt: null },
 		});
 
 		if (!news) {
