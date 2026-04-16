@@ -1,17 +1,18 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, OnModuleDestroy } from "@nestjs/common";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
+import { env } from "@/config/env";
 import { PrismaClient } from "@/generated/prisma/client";
 
 @Injectable()
-export class PrismaService extends PrismaClient {
+export class PrismaService extends PrismaClient implements OnModuleDestroy {
 	constructor() {
-		const url = process.env.DATABASE_URL;
+		super({ adapter: new PrismaLibSql({ url: env.DATABASE_URL }) });
+	}
 
-		if (!url) {
-			throw new Error("DATABASE_URL is not set");
-		}
-
-		const adapter = new PrismaLibSql({ url });
-		super({ adapter });
+	async onModuleDestroy(): Promise<void> {
+		await this.$disconnect();
 	}
 }
+
+// Shared singleton for consumers that live outside NestJS DI (e.g. better-auth).
+export const prisma = new PrismaService();
