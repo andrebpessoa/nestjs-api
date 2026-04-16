@@ -4,9 +4,11 @@
 	"description": "NestJS API with Prisma, better-auth and OpenAPI docs",
 	"author": "Andre Pessoa",
 	"private": true,
-	"license": "UNLICENSED",
+	"license": "MIT",
 	"scripts": {
 		"build": "nest build",
+		"prisma:generate": "bunx prisma generate",
+		"postinstall": "bun run prisma:generate",
 		"start": "nest start",
 		"start:dev": "nest start --watch",
 		"start:debug": "nest start --debug --watch",
