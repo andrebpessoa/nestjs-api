@@ -111,12 +111,20 @@ export class NewsService {
 	async update(id: string, dto: UpdateNewsDto): Promise<News> {
 		await this.assertExists(id);
 
+		const deletedAtUpdate =
+			dto.deleted === false
+				? { deletedAt: null }
+				: dto.deleted === true
+					? { deletedAt: new Date() }
+					: {};
+
 		return this.prisma.news.update({
 			where: { id },
 			data: {
 				title: dto.title,
 				content: dto.content,
 				published: dto.published,
+				...deletedAtUpdate,
 			},
 		});
 	}

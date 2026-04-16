@@ -211,6 +211,22 @@ describe("NewsService", () => {
 		await expect(service.findOne("news_1")).rejects.toThrow(NotFoundException);
 	});
 
+	it("findOne returns news even when deletedAt is set", async () => {
+		const deletedNews = {
+			id: "news_1",
+			title: "Old",
+			deletedAt: new Date("2026-04-01"),
+		};
+		prismaMock.news.findUnique.mockResolvedValue(deletedNews);
+
+		const result = await service.findOne("news_1");
+
+		expect(result).toEqual(deletedNews);
+		expect(prismaMock.news.findUnique).toHaveBeenCalledWith({
+			where: { id: "news_1" },
+		});
+	});
+
 	// --- findAll ---
 
 	it("findAll with defaults returns paginated result", async () => {
@@ -261,5 +277,54 @@ describe("NewsService", () => {
 				where: expect.objectContaining({ authorId: "user_1" }),
 			}),
 		);
+	});
+
+	// --- update with deleted field ---
+
+	it("update with deleted=false sets deletedAt to null (restore)", async () => {
+		prismaMock.news.findUnique.mockResolvedValue({ id: "news_1" });
+		prismaMock.news.update.mockResolvedValue({ id: "news_1", deletedAt: null });
+
+		await service.update("news_1", { deleted: false });
+
+		expect(prismaMock.news.update).toHaveBeenCalledWith({
+			where: { id: "news_1" },
+			data: {
+				title: undefined,
+				content: undefined,
+				published: undefined,
+				deletedAt: null,
+			},
+		});
+	});
+
+	it("update with deleted=true sets deletedAt to current date", async () => {
+		prismaMock.news.findUnique.mockResolvedValue({ id: "news_1" });
+		prismaMock.news.update.mockResolvedValue({
+			id: "news_1",
+			deletedAt: new Date(),
+		});
+
+		await service.update("news_1", { deleted: true });
+
+		expect(prismaMock.news.update).toHaveBeenCalledWith({
+			where: { id: "news_1" },
+			data: {
+				title: undefined,
+				content: undefined,
+				published: undefined,
+				deletedAt: expect.any(Date),
+			},
+		});
+	});
+
+	it("update without deleted field does not change deletedAt", async () => {
+		prismaMock.news.findUnique.mockResolvedValue({ id: "news_1" });
+		prismaMock.news.update.mockResolvedValue({ id: "news_1" });
+
+		await service.update("news_1", { title: "New title" });
+
+		const callArgs = prismaMock.news.update.mock.calls[0]?.[0];
+		expect(callArgs?.data).not.toHaveProperty("deletedAt");
 	});
 });
