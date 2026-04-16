@@ -8,9 +8,19 @@ import { setupOpenApiForEnv } from "@/lib/openapi";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
+	const adapter = new FastifyAdapter({ logger: true });
+
+	adapter.enableCors({
+		origin: ["http://localhost:3000"],
+		credentials: true,
+		methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+		exposedHeaders: ["Set-Cookie"],
+	});
+
 	const app = await NestFactory.create<NestFastifyApplication>(
 		AppModule,
-		new FastifyAdapter({ logger: true }),
+		adapter,
 		{
 			bodyParser: false,
 		},
@@ -21,4 +31,5 @@ async function bootstrap() {
 
 	await app.listen(env.PORT);
 }
+
 bootstrap();
