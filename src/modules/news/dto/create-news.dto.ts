@@ -1,20 +1,12 @@
-import {
-	IsBoolean,
-	IsNotEmpty,
-	IsObject,
-	IsOptional,
-	IsString,
-} from "class-validator";
+import { createZodDto } from "nestjs-zod";
+import * as z from "zod";
 
-export class CreateNewsDto {
-	@IsString()
-	@IsNotEmpty()
-	title!: string;
+export const createNewsSchema = z
+	.object({
+		title: z.string().trim().min(1),
+		content: z.record(z.string(), z.unknown()),
+		published: z.boolean().optional(),
+	})
+	.strict();
 
-	@IsObject()
-	content!: Record<string, unknown>;
-
-	@IsOptional()
-	@IsBoolean()
-	published?: boolean;
-}
+export class CreateNewsDto extends createZodDto(createNewsSchema) {}

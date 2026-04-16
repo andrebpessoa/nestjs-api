@@ -11,7 +11,7 @@ import {
 import {
 	AllowAnonymous,
 	Session,
-	UserSession,
+	type UserSession,
 } from "@thallesp/nestjs-better-auth";
 import { auth } from "@/lib/auth";
 import { CreateNewsDto } from "./dto/create-news.dto";

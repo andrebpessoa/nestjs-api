@@ -60,11 +60,9 @@ export class NewsService {
 		return this.prisma.news.update({
 			where: { id },
 			data: {
-				...(dto.title !== undefined ? { title: dto.title } : {}),
-				...(dto.content !== undefined
-					? { content: dto.content as Prisma.InputJsonValue }
-					: {}),
-				...(dto.published !== undefined ? { published: dto.published } : {}),
+				title: dto.title,
+				content: dto.content as Prisma.InputJsonValue | undefined,
+				published: dto.published,
 			},
 		});
 	}

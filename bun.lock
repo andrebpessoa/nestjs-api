@@ -10,17 +10,16 @@
         "@nestjs/mapped-types": "*",
         "@nestjs/platform-express": "^11.0.1",
         "@nestjs/platform-fastify": "^11.1.19",
-        "@prisma/adapter-better-sqlite3": "^7.7.0",
         "@prisma/adapter-libsql": "^7.7.0",
         "@prisma/client": "^7.7.0",
         "@swc/cli": "^0.8.1",
         "@swc/core": "^1.15.24",
         "@thallesp/nestjs-better-auth": "^2.6.0",
         "better-auth": "^1.6.3",
-        "class-transformer": "^0.5.1",
-        "class-validator": "^0.15.1",
+        "nestjs-zod": "^5.3.0",
         "reflect-metadata": "^0.2.2",
         "rxjs": "^7.8.1",
+        "zod": "^4.3.6",
       },
       "devDependencies": {
         "@biomejs/biome": "2.4.12",
@@ -307,8 +306,6 @@
     "@paralleldrive/cuid2": ["@paralleldrive/cuid2@2.3.1", "", { "dependencies": { "@noble/hashes": "^1.1.5" } }, "sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw=="],
 
     "@pinojs/redact": ["@pinojs/redact@0.4.0", "", {}, "sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg=="],
-
-    "@prisma/adapter-better-sqlite3": ["@prisma/adapter-better-sqlite3@7.7.0", "", { "dependencies": { "@prisma/driver-adapter-utils": "7.7.0", "better-sqlite3": "^12.6.0" } }, "sha512-K6V9AHEKBBC/zo5gXb3PO5A0dYv/fSpCRMnbKY9lpB7B+02MdLSVVP6JtMpLD+NcPDQxKvKACJO7n+zZH4hA5g=="],
 
     "@prisma/adapter-libsql": ["@prisma/adapter-libsql@7.7.0", "", { "dependencies": { "@libsql/client": "^0.17.0", "@prisma/driver-adapter-utils": "7.7.0", "async-mutex": "0.5.0" } }, "sha512-hKPKDIUU91FIC9SfTI3Xga6NGI0W9URmtPoovH94Eighxfx/agjEimTaizivNXgNwW3L/ZY+PceW126jBt3KdA=="],
 
@@ -1179,6 +1176,8 @@
     "negotiator": ["negotiator@1.0.0", "", {}, "sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg=="],
 
     "neo-async": ["neo-async@2.6.2", "", {}, "sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw=="],
+
+    "nestjs-zod": ["nestjs-zod@5.3.0", "", { "dependencies": { "deepmerge": "^4.3.1" }, "peerDependencies": { "@nestjs/common": "^10.0.0 || ^11.0.0", "@nestjs/swagger": "^7.4.2 || ^8.0.0 || ^11.0.0", "rxjs": "^7.0.0", "zod": "^3.25.0 || ^4.0.0" }, "optionalPeers": ["@nestjs/swagger"] }, "sha512-QY6imXm9heMOpWigjFHgMWPvc1ZQHeNQ7pdogo9Q5xj5F8HpqZ972vKlVdkaTyzYlOXJP/yVy3wlF1EjubDQPg=="],
 
     "node-abi": ["node-abi@3.89.0", "", { "dependencies": { "semver": "^7.3.5" } }, "sha512-6u9UwL0HlAl21+agMN3YAMXcKByMqwGx+pq+P76vii5f7hTPtKDp08/H9py6DY+cfDw7kQNTGEj/rly3IgbNQA=="],
 
