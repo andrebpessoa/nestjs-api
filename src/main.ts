@@ -4,6 +4,7 @@ import {
 	NestFastifyApplication,
 } from "@nestjs/platform-fastify";
 import { ZodValidationPipe } from "nestjs-zod";
+import { setupOpenApiForEnv } from "@/lib/openapi";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
@@ -16,6 +17,7 @@ async function bootstrap() {
 	);
 
 	app.useGlobalPipes(new ZodValidationPipe());
+	setupOpenApiForEnv(app);
 
 	await app.listen(process.env.PORT ?? 3000);
 }

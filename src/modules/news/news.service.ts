@@ -28,12 +28,14 @@ export class NewsService {
 
 	async findPublicFeed(query: FeedQueryDto): Promise<PaginatedResult<News>> {
 		const { q, cursor, limit, dateFrom, dateTo, sortBy, order } = query;
+		const parsedDateFrom = dateFrom ? new Date(dateFrom) : undefined;
+		const parsedDateTo = dateTo ? new Date(dateTo) : undefined;
 
 		const where: Prisma.NewsWhereInput = {
 			published: true,
 			...(q && { title: { contains: q } }),
-			...((dateFrom || dateTo) && {
-				createdAt: { gte: dateFrom, lte: dateTo },
+			...((parsedDateFrom || parsedDateTo) && {
+				createdAt: { gte: parsedDateFrom, lte: parsedDateTo },
 			}),
 		};
 
@@ -64,13 +66,15 @@ export class NewsService {
 	async findAll(query: NewsQueryDto): Promise<PaginatedResult<News>> {
 		const { q, cursor, limit, dateFrom, dateTo, sortBy, order, published, authorId } =
 			query;
+		const parsedDateFrom = dateFrom ? new Date(dateFrom) : undefined;
+		const parsedDateTo = dateTo ? new Date(dateTo) : undefined;
 
 		const where: Prisma.NewsWhereInput = {
 			...(published !== undefined && { published }),
 			...(authorId && { authorId }),
 			...(q && { title: { contains: q } }),
-			...((dateFrom || dateTo) && {
-				createdAt: { gte: dateFrom, lte: dateTo },
+			...((parsedDateFrom || parsedDateTo) && {
+				createdAt: { gte: parsedDateFrom, lte: parsedDateTo },
 			}),
 		};
 

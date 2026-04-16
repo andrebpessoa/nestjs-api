@@ -17,10 +17,10 @@ describe("feedQuerySchema", () => {
 		expect(result.limit).toBe(5);
 	});
 
-	it("coerces dateFrom from ISO string to Date", () => {
+	it("accepts dateFrom from ISO string", () => {
 		const result = feedQuerySchema.parse({ dateFrom: "2026-01-01" });
 
-		expect(result.dateFrom).toBeInstanceOf(Date);
+		expect(result.dateFrom).toBe("2026-01-01");
 	});
 
 	it("rejects limit above 50", () => {
