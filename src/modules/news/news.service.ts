@@ -122,8 +122,19 @@ export class NewsService {
 	}
 
 	async remove(id: string): Promise<News> {
-		await this.assertExists(id);
-		return this.prisma.news.delete({ where: { id } });
+		const existing = await this.prisma.news.findFirst({
+			where: { id, deletedAt: null },
+			select: { id: true },
+		});
+
+		if (!existing) {
+			throw new NotFoundException("News not found");
+		}
+
+		return this.prisma.news.update({
+			where: { id },
+			data: { deletedAt: new Date() },
+		});
 	}
 
 	private buildCursorArgs(

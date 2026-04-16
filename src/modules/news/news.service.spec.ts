@@ -175,6 +175,34 @@ describe("NewsService", () => {
 		});
 	});
 
+	// --- remove ---
+
+	it("remove soft-deletes by setting deletedAt instead of deleting the record", async () => {
+		prismaMock.news.findFirst.mockResolvedValue({ id: "news_1" });
+		prismaMock.news.update.mockResolvedValue({
+			id: "news_1",
+			deletedAt: new Date(),
+		});
+
+		await service.remove("news_1");
+
+		expect(prismaMock.news.update).toHaveBeenCalledWith({
+			where: { id: "news_1" },
+			data: { deletedAt: expect.any(Date) },
+		});
+		expect(prismaMock.news.delete).not.toHaveBeenCalled();
+	});
+
+	it("remove throws NotFoundException when news is already soft-deleted", async () => {
+		prismaMock.news.findFirst.mockResolvedValue(null);
+
+		await expect(service.remove("news_deleted")).rejects.toThrow(
+			NotFoundException,
+		);
+
+		expect(prismaMock.news.update).not.toHaveBeenCalled();
+	});
+
 	// --- findOne ---
 
 	it("findOne should throw NotFoundException when item does not exist", async () => {
