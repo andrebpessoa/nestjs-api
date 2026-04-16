@@ -3,6 +3,7 @@ import {
 	FastifyAdapter,
 	NestFastifyApplication,
 } from "@nestjs/platform-fastify";
+import { ZodValidationPipe } from "nestjs-zod";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
@@ -13,6 +14,8 @@ async function bootstrap() {
 			bodyParser: false,
 		},
 	);
+
+	app.useGlobalPipes(new ZodValidationPipe());
 
 	await app.listen(process.env.PORT ?? 3000);
 }
