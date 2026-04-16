@@ -1,6 +1,6 @@
+import type { Prisma } from "@db/prisma/generated/prisma/client";
 import { createZodDto } from "nestjs-zod";
 import * as z from "zod";
-import type { Prisma } from "@/generated/prisma/client";
 
 export const createNewsSchema = z
 	.object({
