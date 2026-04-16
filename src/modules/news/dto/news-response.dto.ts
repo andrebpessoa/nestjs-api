@@ -9,6 +9,7 @@ export const newsResponseSchema = z.object({
 	authorId: z.string(),
 	createdAt: z.iso.datetime(),
 	updatedAt: z.iso.datetime(),
+	deletedAt: z.iso.datetime().nullable(),
 });
 
 export class NewsResponseDto extends createZodDto(newsResponseSchema) {}

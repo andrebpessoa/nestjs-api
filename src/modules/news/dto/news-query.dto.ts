@@ -9,6 +9,10 @@ export const newsQuerySchema = feedQuerySchema
 			.transform((v) => v === "true")
 			.optional(),
 		authorId: z.string().optional(),
+		includeDeleted: z
+			.enum(["true", "false"])
+			.transform((v) => v === "true")
+			.optional(),
 	})
 	.strict();
 
