@@ -1,8 +1,8 @@
 {
 	"name": "nest-api",
 	"version": "0.0.1",
-	"description": "",
-	"author": "",
+	"description": "NestJS API with Prisma, better-auth and OpenAPI docs",
+	"author": "Andre Pessoa",
 	"private": true,
 	"license": "UNLICENSED",
 	"scripts": {
