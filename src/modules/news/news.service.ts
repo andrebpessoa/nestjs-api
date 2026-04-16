@@ -6,7 +6,7 @@ import { FeedQueryDto } from "./dto/feed-query.dto";
 import { NewsQueryDto } from "./dto/news-query.dto";
 import { UpdateNewsDto } from "./dto/update-news.dto";
 
-interface PaginatedResult<T> {
+export interface PaginatedResult<T> {
 	data: T[];
 	nextCursor: string | null;
 }
@@ -45,7 +45,8 @@ export class NewsService {
 				{ [sortBy]: order } as Prisma.NewsOrderByWithRelationInput,
 				{ id: order },
 			],
-			...this.buildCursorArgs(cursor, limit),
+			take: limit + 1,
+			...this.buildCursorArgs(cursor),
 		});
 
 		return this.paginateResult(items, limit);
@@ -93,7 +94,8 @@ export class NewsService {
 				{ [sortBy]: order } as Prisma.NewsOrderByWithRelationInput,
 				{ id: order },
 			],
-			...this.buildCursorArgs(cursor, limit),
+			take: limit + 1,
+			...this.buildCursorArgs(cursor),
 		});
 
 		return this.paginateResult(items, limit);
@@ -127,10 +129,10 @@ export class NewsService {
 		return this.prisma.news.delete({ where: { id } });
 	}
 
-	private buildCursorArgs(cursor: string | undefined, limit: number) {
-		return cursor
-			? { take: limit + 1, skip: 1, cursor: { id: cursor } }
-			: { take: limit + 1 };
+	private buildCursorArgs(
+		cursor: string | undefined,
+	): Pick<Prisma.NewsFindManyArgs, "skip" | "cursor"> {
+		return cursor ? { skip: 1, cursor: { id: cursor } } : {};
 	}
 
 	private paginateResult<T extends { id: string }>(
@@ -139,9 +141,10 @@ export class NewsService {
 	): PaginatedResult<T> {
 		const hasNextPage = items.length > limit;
 		const data = hasNextPage ? items.slice(0, limit) : items;
+		const last = data.at(-1);
 		return {
 			data,
-			nextCursor: hasNextPage ? data[data.length - 1].id : null,
+			nextCursor: hasNextPage && last ? last.id : null,
 		};
 	}
 

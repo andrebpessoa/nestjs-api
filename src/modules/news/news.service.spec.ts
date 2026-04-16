@@ -114,7 +114,7 @@ describe("NewsService", () => {
 		});
 		await service.findPublicFeed(query);
 
-		const call = prismaMock.news.findMany.mock.calls[0][0];
+			const call = prismaMock.news.findMany.mock.calls[0]![0]!;
 		expect(call.where.createdAt).toBeDefined();
 		expect(call.where.createdAt.gte).toBeInstanceOf(Date);
 		expect(call.where.createdAt.lte).toBeInstanceOf(Date);

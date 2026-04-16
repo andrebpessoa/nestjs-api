@@ -35,7 +35,7 @@ describe("News API (e2e)", () => {
 		await app.close();
 	});
 
-	async function signUpAndGetCookie() {
+	async function signUpAndGetCookie(): Promise<string> {
 		const email = `news-${Date.now()}-${Math.random().toString(16).slice(2)}@example.com`;
 		const response = await request(app.getHttpServer())
 			.post("/api/auth/sign-up/email")
@@ -51,8 +51,8 @@ describe("News API (e2e)", () => {
 		expect(setCookie).toBeDefined();
 
 		return Array.isArray(setCookie)
-			? setCookie.map((cookie: string) => cookie.split(";")[0]).join("; ")
-			: setCookie.split(";")[0];
+			? setCookie.map((cookie: string) => cookie.split(";")[0]!).join("; ")
+			: setCookie!.split(";")[0]!;
 	}
 
 	async function createNews(
@@ -179,7 +179,7 @@ describe("News API (e2e)", () => {
 			.expect(200);
 
 		expect(response.body.data).toHaveLength(1);
-		expect(response.body.data[0].title).toBe("NestJS guide");
+			expect(response.body.data[0]!.title).toBe("NestJS guide");
 	});
 
 	it("GET /news/feed?limit=1 returns one item with non-null nextCursor", async () => {
@@ -216,7 +216,7 @@ describe("News API (e2e)", () => {
 			.expect(200);
 
 		expect(page2.body.data).toHaveLength(1);
-		expect(page2.body.data[0].id).toBe(first.id);
+			expect(page2.body.data[0]!.id).toBe(first.id);
 	});
 
 	it("GET /news/feed with limit larger than total returns nextCursor null", async () => {
