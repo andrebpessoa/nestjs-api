@@ -114,10 +114,13 @@ describe("NewsService", () => {
 		});
 		await service.findPublicFeed(query);
 
-			const call = prismaMock.news.findMany.mock.calls[0]![0]!;
-		expect(call.where.createdAt).toBeDefined();
-		expect(call.where.createdAt.gte).toBeInstanceOf(Date);
-		expect(call.where.createdAt.lte).toBeInstanceOf(Date);
+		const firstCall = prismaMock.news.findMany.mock.calls[0];
+		expect(firstCall).toBeDefined();
+
+		const callArgs = firstCall?.[0];
+		expect(callArgs?.where.createdAt).toBeDefined();
+		expect(callArgs?.where.createdAt?.gte).toBeInstanceOf(Date);
+		expect(callArgs?.where.createdAt?.lte).toBeInstanceOf(Date);
 	});
 
 	// --- findPublicById ---

@@ -50,9 +50,27 @@ describe("News API (e2e)", () => {
 		const setCookie = response.headers["set-cookie"];
 		expect(setCookie).toBeDefined();
 
-		return Array.isArray(setCookie)
-			? setCookie.map((cookie: string) => cookie.split(";")[0]!).join("; ")
-			: setCookie!.split(";")[0]!;
+		if (!setCookie) {
+			throw new Error("Missing set-cookie header");
+		}
+
+		if (Array.isArray(setCookie)) {
+			return setCookie
+				.map((cookie: string) => {
+					const firstPart = cookie.split(";")[0];
+					if (!firstPart) {
+						throw new Error("Invalid cookie header format");
+					}
+					return firstPart;
+				})
+				.join("; ");
+		}
+
+		const firstPart = setCookie.split(";")[0];
+		if (!firstPart) {
+			throw new Error("Invalid cookie header format");
+		}
+		return firstPart;
 	}
 
 	async function createNews(
@@ -179,7 +197,9 @@ describe("News API (e2e)", () => {
 			.expect(200);
 
 		expect(response.body.data).toHaveLength(1);
-			expect(response.body.data[0]!.title).toBe("NestJS guide");
+		const firstItem = response.body.data[0];
+		expect(firstItem).toBeDefined();
+		expect(firstItem?.title).toBe("NestJS guide");
 	});
 
 	it("GET /news/feed?limit=1 returns one item with non-null nextCursor", async () => {
@@ -216,7 +236,9 @@ describe("News API (e2e)", () => {
 			.expect(200);
 
 		expect(page2.body.data).toHaveLength(1);
-			expect(page2.body.data[0]!.id).toBe(first.id);
+		const page2FirstItem = page2.body.data[0];
+		expect(page2FirstItem).toBeDefined();
+		expect(page2FirstItem?.id).toBe(first.id);
 	});
 
 	it("GET /news/feed with limit larger than total returns nextCursor null", async () => {
