@@ -1,10 +1,9 @@
-import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
+import { Module } from "@nestjs/common";
+import { AuthModule } from "@thallesp/nestjs-better-auth";
+import { auth } from "./lib/auth";
+import { NewsModule } from "./modules/news/news.module";
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+	imports: [AuthModule.forRoot({ auth, isGlobal: true }), NewsModule],
 })
 export class AppModule {}
