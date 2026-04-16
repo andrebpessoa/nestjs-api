@@ -1,6 +1,6 @@
+import { News, Prisma } from "@db/prisma/generated/prisma/client";
 import { PrismaService } from "@db/prisma/prisma.service";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { News, Prisma } from "@/generated/prisma/client";
 import { CreateNewsDto } from "./dto/create-news.dto";
 import { FeedQueryDto } from "./dto/feed-query.dto";
 import { NewsQueryDto } from "./dto/news-query.dto";
