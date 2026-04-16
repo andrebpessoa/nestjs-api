@@ -73,11 +73,13 @@ export class NewsService {
 			order,
 			published,
 			authorId,
+			includeDeleted,
 		} = query;
 		const parsedDateFrom = dateFrom ? new Date(dateFrom) : undefined;
 		const parsedDateTo = dateTo ? new Date(dateTo) : undefined;
 
 		const where: Prisma.NewsWhereInput = {
+			...(includeDeleted ? {} : { deletedAt: null }),
 			...(published !== undefined && { published }),
 			...(authorId && { authorId }),
 			...(q && { title: { contains: q } }),

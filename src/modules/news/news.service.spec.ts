@@ -192,11 +192,21 @@ describe("NewsService", () => {
 		const result = await service.findAll(query);
 
 		expect(prismaMock.news.findMany).toHaveBeenCalledWith({
-			where: {},
+			where: { deletedAt: null },
 			orderBy: [{ createdAt: "desc" }, { id: "desc" }],
 			take: 21,
 		});
 		expect(result).toEqual({ data: [], nextCursor: null });
+	});
+
+	it("findAll with includeDeleted=true omits deletedAt filter", async () => {
+		prismaMock.news.findMany.mockResolvedValue([]);
+
+		const query = newsQuerySchema.parse({ includeDeleted: "true" });
+		await service.findAll(query);
+
+		const callArgs = prismaMock.news.findMany.mock.calls[0]?.[0];
+		expect(callArgs?.where).not.toHaveProperty("deletedAt");
 	});
 
 	it("findAll with published=false filters to drafts", async () => {
