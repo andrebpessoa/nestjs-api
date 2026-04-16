@@ -1,5 +1,6 @@
 import { UnauthorizedException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+import { ThrottlerModule } from "@nestjs/throttler";
 import { UserSession } from "@thallesp/nestjs-better-auth";
 import { auth } from "@/lib/auth";
 import { CreateNewsDto } from "./dto/create-news.dto";
@@ -25,6 +26,13 @@ describe("NewsController", () => {
 		vi.clearAllMocks();
 
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [
+				ThrottlerModule.forRoot([
+					{ name: "auth", ttl: 60000, limit: 20 },
+					{ name: "news", ttl: 60000, limit: 100 },
+					{ name: "feed", ttl: 60000, limit: 200 },
+				]),
+			],
 			controllers: [NewsController],
 			providers: [
 				{

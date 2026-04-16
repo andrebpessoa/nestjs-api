@@ -18,6 +18,7 @@ import {
 	ApiTags,
 	ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
+import { SkipThrottle, Throttle } from "@nestjs/throttler";
 import {
 	AllowAnonymous,
 	Session,
@@ -36,11 +37,15 @@ import { NewsService } from "./news.service";
 
 @ApiTags("news")
 @Controller("news")
+@Throttle({ news: { ttl: 60000, limit: 100 } })
+@SkipThrottle({ auth: true, feed: true })
 export class NewsController {
 	constructor(private readonly newsService: NewsService) {}
 
 	@AllowAnonymous()
 	@Get("feed")
+	@SkipThrottle({ auth: true, news: true })
+	@Throttle({ feed: { ttl: 60000, limit: 200 } })
 	@ApiOperation({ summary: "List published news" })
 	@ApiOkResponse({ type: PaginatedNewsResponseDto })
 	feed(@Query() query: FeedQueryDto) {
@@ -49,6 +54,8 @@ export class NewsController {
 
 	@AllowAnonymous()
 	@Get("feed/:id")
+	@SkipThrottle({ auth: true, news: true })
+	@Throttle({ feed: { ttl: 60000, limit: 200 } })
 	@ApiOperation({ summary: "Get a published news item by id" })
 	@ApiOkResponse({ type: NewsResponseDto })
 	@ApiNotFoundResponse({ description: "News not found" })
