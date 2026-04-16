@@ -64,8 +64,17 @@ export class NewsService {
 	}
 
 	async findAll(query: NewsQueryDto): Promise<PaginatedResult<News>> {
-		const { q, cursor, limit, dateFrom, dateTo, sortBy, order, published, authorId } =
-			query;
+		const {
+			q,
+			cursor,
+			limit,
+			dateFrom,
+			dateTo,
+			sortBy,
+			order,
+			published,
+			authorId,
+		} = query;
 		const parsedDateFrom = dateFrom ? new Date(dateFrom) : undefined;
 		const parsedDateTo = dateTo ? new Date(dateTo) : undefined;
 

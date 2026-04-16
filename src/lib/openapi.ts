@@ -15,9 +15,7 @@ export function setupOpenApi(app: INestApplication): void {
 		.addCookieAuth("session")
 		.build();
 
-	const document = cleanupOpenApiDoc(
-		SwaggerModule.createDocument(app, config),
-	);
+	const document = cleanupOpenApiDoc(SwaggerModule.createDocument(app, config));
 
 	app.getHttpAdapter().get("/openapi.json", (_req: unknown, res: any) => {
 		if (typeof res.header === "function") {

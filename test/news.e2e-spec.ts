@@ -241,7 +241,9 @@ describe("News API (e2e)", () => {
 			.set("Cookie", cookie)
 			.expect(200);
 
-		expect(response.body.data.every((n: { published: boolean }) => !n.published)).toBe(true);
+		expect(
+			response.body.data.every((n: { published: boolean }) => !n.published),
+		).toBe(true);
 	});
 
 	it("GET /news?authorId=<id> returns only that author's items", async () => {

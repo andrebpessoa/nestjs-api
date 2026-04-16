@@ -15,8 +15,8 @@ import {
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
-	ApiUnauthorizedResponse,
 	ApiTags,
+	ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 import {
 	AllowAnonymous,

@@ -9,7 +9,9 @@ import { App } from "supertest/types";
 import { setupOpenApiForEnv } from "@/lib/openapi";
 import { AppModule } from "../src/app.module";
 
-async function createAppForEnv(nodeEnv: string): Promise<INestApplication<App>> {
+async function createAppForEnv(
+	nodeEnv: string,
+): Promise<INestApplication<App>> {
 	const moduleFixture: TestingModule = await Test.createTestingModule({
 		imports: [AppModule],
 	}).compile();
