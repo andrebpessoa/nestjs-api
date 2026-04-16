@@ -41,10 +41,7 @@ export class NewsService {
 
 		const items = await this.prisma.news.findMany({
 			where,
-			orderBy: [
-				{ [sortBy]: order } as Prisma.NewsOrderByWithRelationInput,
-				{ id: order },
-			],
+			orderBy: this.buildOrderBy(sortBy, order),
 			take: limit + 1,
 			...this.buildCursorArgs(cursor),
 		});
@@ -90,10 +87,7 @@ export class NewsService {
 
 		const items = await this.prisma.news.findMany({
 			where,
-			orderBy: [
-				{ [sortBy]: order } as Prisma.NewsOrderByWithRelationInput,
-				{ id: order },
-			],
+			orderBy: this.buildOrderBy(sortBy, order),
 			take: limit + 1,
 			...this.buildCursorArgs(cursor),
 		});
@@ -133,6 +127,19 @@ export class NewsService {
 		cursor: string | undefined,
 	): Pick<Prisma.NewsFindManyArgs, "skip" | "cursor"> {
 		return cursor ? { skip: 1, cursor: { id: cursor } } : {};
+	}
+
+	private buildOrderBy(
+		sortBy: "createdAt" | "updatedAt" | "title",
+		order: "asc" | "desc",
+	): Prisma.NewsOrderByWithRelationInput[] {
+		const primary: Prisma.NewsOrderByWithRelationInput =
+			sortBy === "title"
+				? { title: order }
+				: sortBy === "updatedAt"
+					? { updatedAt: order }
+					: { createdAt: order };
+		return [primary, { id: order }];
 	}
 
 	private paginateResult<T extends { id: string }>(
