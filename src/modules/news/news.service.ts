@@ -2,7 +2,14 @@ import { PrismaService } from "@db/prisma/prisma.service";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { News, Prisma } from "@/generated/prisma/client";
 import { CreateNewsDto } from "./dto/create-news.dto";
+import { FeedQueryDto } from "./dto/feed-query.dto";
+import { NewsQueryDto } from "./dto/news-query.dto";
 import { UpdateNewsDto } from "./dto/update-news.dto";
+
+interface PaginatedResult<T> {
+	data: T[];
+	nextCursor: string | null;
+}
 
 @Injectable()
 export class NewsService {
@@ -19,11 +26,27 @@ export class NewsService {
 		});
 	}
 
-	async findPublicFeed(): Promise<News[]> {
-		return this.prisma.news.findMany({
-			where: { published: true },
-			orderBy: { createdAt: "desc" },
+	async findPublicFeed(query: FeedQueryDto): Promise<PaginatedResult<News>> {
+		const { q, cursor, limit, dateFrom, dateTo, sortBy, order } = query;
+
+		const where: Prisma.NewsWhereInput = {
+			published: true,
+			...(q && { title: { contains: q } }),
+			...((dateFrom || dateTo) && {
+				createdAt: { gte: dateFrom, lte: dateTo },
+			}),
+		};
+
+		const items = await this.prisma.news.findMany({
+			where,
+			orderBy: [
+				{ [sortBy]: order } as Prisma.NewsOrderByWithRelationInput,
+				{ id: order },
+			],
+			...this.buildCursorArgs(cursor, limit),
 		});
+
+		return this.paginateResult(items, limit);
 	}
 
 	async findPublicById(id: string): Promise<News> {
@@ -38,10 +61,29 @@ export class NewsService {
 		return news;
 	}
 
-	async findAll(): Promise<News[]> {
-		return this.prisma.news.findMany({
-			orderBy: { createdAt: "desc" },
+	async findAll(query: NewsQueryDto): Promise<PaginatedResult<News>> {
+		const { q, cursor, limit, dateFrom, dateTo, sortBy, order, published, authorId } =
+			query;
+
+		const where: Prisma.NewsWhereInput = {
+			...(published !== undefined && { published }),
+			...(authorId && { authorId }),
+			...(q && { title: { contains: q } }),
+			...((dateFrom || dateTo) && {
+				createdAt: { gte: dateFrom, lte: dateTo },
+			}),
+		};
+
+		const items = await this.prisma.news.findMany({
+			where,
+			orderBy: [
+				{ [sortBy]: order } as Prisma.NewsOrderByWithRelationInput,
+				{ id: order },
+			],
+			...this.buildCursorArgs(cursor, limit),
 		});
+
+		return this.paginateResult(items, limit);
 	}
 
 	async findOne(id: string): Promise<News> {
@@ -70,6 +112,24 @@ export class NewsService {
 	async remove(id: string): Promise<News> {
 		await this.assertExists(id);
 		return this.prisma.news.delete({ where: { id } });
+	}
+
+	private buildCursorArgs(cursor: string | undefined, limit: number) {
+		return cursor
+			? { take: limit + 1, skip: 1, cursor: { id: cursor } }
+			: { take: limit + 1 };
+	}
+
+	private paginateResult<T extends { id: string }>(
+		items: T[],
+		limit: number,
+	): PaginatedResult<T> {
+		const hasNextPage = items.length > limit;
+		const data = hasNextPage ? items.slice(0, limit) : items;
+		return {
+			data,
+			nextCursor: hasNextPage ? data[data.length - 1].id : null,
+		};
 	}
 
 	private async assertExists(id: string): Promise<void> {

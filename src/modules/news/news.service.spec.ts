@@ -1,6 +1,8 @@
 import { PrismaService } from "@db/prisma/prisma.service";
 import { NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+import { feedQuerySchema } from "./dto/feed-query.dto";
+import { newsQuerySchema } from "./dto/news-query.dto";
 import { CreateNewsDto } from "./dto/create-news.dto";
 import { NewsService } from "./news.service";
 
@@ -33,16 +35,92 @@ describe("NewsService", () => {
 		service = module.get<NewsService>(NewsService);
 	});
 
-	it("findPublicFeed should query only published news", async () => {
+	// --- findPublicFeed ---
+
+	it("findPublicFeed with defaults queries only published news", async () => {
 		prismaMock.news.findMany.mockResolvedValue([]);
 
-		await service.findPublicFeed();
+		const query = feedQuerySchema.parse({});
+		const result = await service.findPublicFeed(query);
 
 		expect(prismaMock.news.findMany).toHaveBeenCalledWith({
 			where: { published: true },
-			orderBy: { createdAt: "desc" },
+			orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+			take: 21,
 		});
+		expect(result).toEqual({ data: [], nextCursor: null });
 	});
+
+	it("findPublicFeed with q adds title contains filter", async () => {
+		prismaMock.news.findMany.mockResolvedValue([]);
+
+		const query = feedQuerySchema.parse({ q: "nestjs" });
+		await service.findPublicFeed(query);
+
+		expect(prismaMock.news.findMany).toHaveBeenCalledWith(
+			expect.objectContaining({
+				where: { published: true, title: { contains: "nestjs" } },
+			}),
+		);
+	});
+
+	it("findPublicFeed with cursor passes cursor and skip args", async () => {
+		prismaMock.news.findMany.mockResolvedValue([]);
+
+		const query = feedQuerySchema.parse({ cursor: "news_cursor", limit: "5" });
+		await service.findPublicFeed(query);
+
+		expect(prismaMock.news.findMany).toHaveBeenCalledWith(
+			expect.objectContaining({
+				cursor: { id: "news_cursor" },
+				skip: 1,
+				take: 6,
+			}),
+		);
+	});
+
+	it("findPublicFeed returns nextCursor when more items exist", async () => {
+		const items = [
+			{ id: "a", title: "A" },
+			{ id: "b", title: "B" },
+			{ id: "c", title: "C" },
+		];
+		prismaMock.news.findMany.mockResolvedValue(items);
+
+		const query = feedQuerySchema.parse({ limit: "2" });
+		const result = await service.findPublicFeed(query);
+
+		expect(result.data).toHaveLength(2);
+		expect(result.nextCursor).toBe("b");
+	});
+
+	it("findPublicFeed returns nextCursor null when no more items", async () => {
+		const items = [{ id: "a", title: "A" }];
+		prismaMock.news.findMany.mockResolvedValue(items);
+
+		const query = feedQuerySchema.parse({ limit: "2" });
+		const result = await service.findPublicFeed(query);
+
+		expect(result.data).toHaveLength(1);
+		expect(result.nextCursor).toBeNull();
+	});
+
+	it("findPublicFeed with dateFrom and dateTo adds createdAt range filter", async () => {
+		prismaMock.news.findMany.mockResolvedValue([]);
+
+		const query = feedQuerySchema.parse({
+			dateFrom: "2026-01-01",
+			dateTo: "2026-12-31",
+		});
+		await service.findPublicFeed(query);
+
+		const call = prismaMock.news.findMany.mock.calls[0][0];
+		expect(call.where.createdAt).toBeDefined();
+		expect(call.where.createdAt.gte).toBeInstanceOf(Date);
+		expect(call.where.createdAt.lte).toBeInstanceOf(Date);
+	});
+
+	// --- findPublicById ---
 
 	it("findPublicById should throw NotFoundException for draft or missing item", async () => {
 		prismaMock.news.findFirst.mockResolvedValue(null);
@@ -51,6 +129,8 @@ describe("NewsService", () => {
 			NotFoundException,
 		);
 	});
+
+	// --- create ---
 
 	it("create should persist authorId from session argument", async () => {
 		const dto: CreateNewsDto = {
@@ -81,9 +161,53 @@ describe("NewsService", () => {
 		});
 	});
 
+	// --- findOne ---
+
 	it("findOne should throw NotFoundException when item does not exist", async () => {
 		prismaMock.news.findUnique.mockResolvedValue(null);
 
 		await expect(service.findOne("news_1")).rejects.toThrow(NotFoundException);
+	});
+
+	// --- findAll ---
+
+	it("findAll with defaults returns paginated result", async () => {
+		prismaMock.news.findMany.mockResolvedValue([]);
+
+		const query = newsQuerySchema.parse({});
+		const result = await service.findAll(query);
+
+		expect(prismaMock.news.findMany).toHaveBeenCalledWith({
+			where: {},
+			orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+			take: 21,
+		});
+		expect(result).toEqual({ data: [], nextCursor: null });
+	});
+
+	it("findAll with published=false filters to drafts", async () => {
+		prismaMock.news.findMany.mockResolvedValue([]);
+
+		const query = newsQuerySchema.parse({ published: "false" });
+		await service.findAll(query);
+
+		expect(prismaMock.news.findMany).toHaveBeenCalledWith(
+			expect.objectContaining({
+				where: expect.objectContaining({ published: false }),
+			}),
+		);
+	});
+
+	it("findAll with authorId filters by author", async () => {
+		prismaMock.news.findMany.mockResolvedValue([]);
+
+		const query = newsQuerySchema.parse({ authorId: "user_1" });
+		await service.findAll(query);
+
+		expect(prismaMock.news.findMany).toHaveBeenCalledWith(
+			expect.objectContaining({
+				where: expect.objectContaining({ authorId: "user_1" }),
+			}),
+		);
 	});
 });
