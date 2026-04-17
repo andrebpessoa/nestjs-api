@@ -59,7 +59,11 @@ describe("NewsService", () => {
 
 		expect(prismaMock.news.findMany).toHaveBeenCalledWith(
 			expect.objectContaining({
-				where: { published: true, title: { contains: "nestjs" }, deletedAt: null },
+				where: {
+					published: true,
+					title: { contains: "nestjs" },
+					deletedAt: null,
+				},
 			}),
 		);
 	});
@@ -211,19 +215,12 @@ describe("NewsService", () => {
 		await expect(service.findOne("news_1")).rejects.toThrow(NotFoundException);
 	});
 
-	it("findOne returns news even when deletedAt is set", async () => {
-		const deletedNews = {
-			id: "news_1",
-			title: "Old",
-			deletedAt: new Date("2026-04-01"),
-		};
-		prismaMock.news.findUnique.mockResolvedValue(deletedNews);
+	it("findOne throws NotFoundException when item is soft-deleted", async () => {
+		prismaMock.news.findFirst.mockResolvedValue(null);
 
-		const result = await service.findOne("news_1");
-
-		expect(result).toEqual(deletedNews);
-		expect(prismaMock.news.findUnique).toHaveBeenCalledWith({
-			where: { id: "news_1" },
+		await expect(service.findOne("news_1")).rejects.toThrow(NotFoundException);
+		expect(prismaMock.news.findFirst).toHaveBeenCalledWith({
+			where: { id: "news_1", deletedAt: null },
 		});
 	});
 

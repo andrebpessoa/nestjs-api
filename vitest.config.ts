@@ -22,6 +22,12 @@ export default defineConfig({
 	],
 	test: {
 		globals: true,
+		env: {
+			DATABASE_URL: "file:./test.db",
+			BETTER_AUTH_SECRET: "test-secret-with-at-least-32-chars",
+			BETTER_AUTH_URL: "http://localhost:3000",
+			NODE_ENV: "test",
+		},
 		coverage: {
 			provider: "istanbul",
 		},
@@ -39,10 +45,6 @@ export default defineConfig({
 					name: "e2e",
 					include: ["test/**/*.e2e-spec.ts"],
 					globalSetup: ["./test/setup/e2e-global-setup.ts"],
-					env: {
-						DATABASE_URL: "file:./test.db",
-						NODE_ENV: "test",
-					},
 				},
 			},
 		],

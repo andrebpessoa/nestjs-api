@@ -99,7 +99,9 @@ export class NewsService {
 	}
 
 	async findOne(id: string): Promise<News> {
-		const news = await this.prisma.news.findUnique({ where: { id } });
+		const news = await this.prisma.news.findFirst({
+			where: { id, deletedAt: null },
+		});
 
 		if (!news) {
 			throw new NotFoundException("News not found");
